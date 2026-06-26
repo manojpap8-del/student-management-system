@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Management System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>🎓 Smart College Student Management</h1>
+
+        <div class="stats">
+
+        <h3>
+            Total Students:
+            <span id="studentCount">0</span>
+        </h3>
+
+</div>
+
+        <!-- Add/Edit Student Form -->
+        <div class="form-section">
+            <h2 id="formTitle">Add New Student</h2>
+            <form id="studentForm">
+                <input type="hidden" id="studentId">
+                <input type="text" id="name" placeholder="Name" required>
+                <input type="email" id="email" placeholder="Email" required>
+                <input type="text" id="course" placeholder="Course" required>
+                <input type="number" id="age" placeholder="Age" required>
+                <button type="submit" id="submitBtn">Add Student</button>
+                <button type="button" id="cancelBtn" style="display:none;">Cancel</button>
+            </form>
+            <p id="errorMsg" class="error"></p>
+        </div>
+
+        <!-- Students List -->
+        <div class="list-section">
+            <h2>Students List</h2>
+               <input
+               type="text"
+               id="searchInput"
+               placeholder="Search by name">
+            <table id="studentTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Course</th>
+                        <th>Age</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="studentTableBody">
+                    <!-- JS se data yaha aayega -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
