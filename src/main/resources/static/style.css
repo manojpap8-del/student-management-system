@@ -90,3 +90,103 @@ button.delete-btn {
 .error {
     color: red;
 }
+
+/* ============ RESPONSIVE DESIGN ============ */
+
+/* Table ko mobile pe scroll karne layak banana */
+.list-section {
+    overflow-x: auto;
+}
+
+#searchInput {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Tablet (768px aur usse kam) */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    .container {
+        padding: 15px;
+        max-width: 100%;
+    }
+
+    h1 {
+        font-size: 22px;
+    }
+
+    .form-section {
+        padding: 15px;
+    }
+
+    #studentForm button,
+    #cancelBtn {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 8px;
+    }
+
+    th, td {
+        padding: 8px;
+        font-size: 14px;
+    }
+
+    button.edit-btn,
+    button.delete-btn {
+        padding: 6px 8px;
+        font-size: 13px;
+        display: block;
+        width: 100%;
+        margin-bottom: 5px;
+    }
+}
+
+/* Mobile (480px aur usse kam) */
+@media (max-width: 480px) {
+    h1 {
+        font-size: 18px;
+    }
+
+    .stats h3 {
+        font-size: 16px;
+    }
+
+    #studentForm input {
+        font-size: 14px;
+    }
+
+    table, thead, tbody, th, td, tr {
+        display: block;
+    }
+
+    thead tr {
+        display: none;
+    }
+
+    tbody tr {
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        padding: 10px;
+    }
+
+    tbody td {
+        border: none;
+        padding: 5px 0;
+        position: relative;
+    }
+
+    tbody td::before {
+        font-weight: bold;
+        color: #2c3e50;
+        display: inline-block;
+        width: 80px;
+        content: attr(data-label);
+    }
+}

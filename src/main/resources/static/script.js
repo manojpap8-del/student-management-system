@@ -6,49 +6,63 @@ const formTitle = document.getElementById("formTitle");
 const submitBtn = document.getElementById("submitBtn");
 const cancelBtn = document.getElementById("cancelBtn");
 const errorMsg = document.getElementById("errorMsg");
-const searchInput =
-document.getElementById(
-"searchInput"
-);
+const searchInput = document.getElementById("searchInput");
 
 let editMode = false;
+
+// Token check karna - agar nahi hai to login page pe bhejo
+const token = localStorage.getItem("token");
+if (!token) {
+    window.location.href = "login.html";
+}
+
+// Har request ke liye common headers (token ke saath)
+function getAuthHeaders() {
+    return {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + localStorage.getItem("token")
+    };
+}
+
+// Logout function
+function logout() {
+    localStorage.removeItem("token");
+    window.location.href = "login.html";
+}
 
 // Page load hote hi students fetch karo
 document.addEventListener("DOMContentLoaded", fetchStudents);
 
 // Sab students fetch karke table me dikhana
 function fetchStudents() {
-    fetch(API_URL)
-        .then(res => res.json())
-       .then(data => {
+    fetch(API_URL, { headers: getAuthHeaders() })
+        .then(res => {
+            if (res.status === 401) {
+                logout(); // token expire/invalid hai, login pe bhejo
+                return;
+            }
+            return res.json();
+        })
+        .then(data => {
+            if (!data) return;
 
-    tableBody.innerHTML = "";
+            tableBody.innerHTML = "";
 
-    const filtered =
-    data.filter(student =>
+            const filtered = data.filter(student =>
+                student.name.toLowerCase().includes(searchInput.value.toLowerCase())
+            );
 
-        student.name
-        .toLowerCase()
+            document.getElementById("studentCount").textContent = data.length;
 
-        .includes(
-
-            searchInput
-            .value
-            .toLowerCase()
-
-        )
-
-    );
-
-    filtered.forEach(student => {
+            filtered.forEach(student => {
                 const row = document.createElement("tr");
                 row.innerHTML = `
-                    <td>${student.id}</td>
-                    <td>${student.name}</td>
-                    <td>${student.email}</td>
-                    <td>${student.course}</td>
-                    <td>${student.age}</td>
-                    <td>
+                    <td data-label="ID">${student.id}</td>
+                    <td data-label="Name">${student.name}</td>
+                    <td data-label="Email">${student.email}</td>
+                    <td data-label="Course">${student.course}</td>
+                    <td data-label="Age">${student.age}</td>
+                    <td data-label="Actions">
                         <button class="edit-btn" onclick="editStudent(${student.id}, '${student.name}', '${student.email}', '${student.course}', ${student.age})">Edit</button>
                         <button class="delete-btn" onclick="deleteStudent(${student.id})">Delete</button>
                     </td>
@@ -56,7 +70,7 @@ function fetchStudents() {
                 tableBody.appendChild(row);
             });
         })
-        .catch(err => console.error("Error fetching students: - script.js:59", err));
+        .catch(err => console.error("Error fetching students: - script.js:73", err));
 }
 
 // Form submit hone par (Add ya Update)
@@ -75,10 +89,11 @@ form.addEventListener("submit", function (e) {
         const id = document.getElementById("studentId").value;
         fetch(`${API_URL}/${id}`, {
             method: "PUT",
-            headers: { "Content-Type": "application/json" },
+            headers: getAuthHeaders(),
             body: JSON.stringify(student)
         })
         .then(res => {
+            if (res.status === 401) { logout(); return; }
             if (!res.ok) throw new Error("Update failed");
             return res.json();
         })
@@ -90,10 +105,11 @@ form.addEventListener("submit", function (e) {
     } else {
         fetch(API_URL, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: getAuthHeaders(),
             body: JSON.stringify(student)
         })
         .then(res => {
+            if (res.status === 401) { logout(); return; }
             if (!res.ok) {
                 return res.json().then(data => { throw data; });
             }
@@ -139,12 +155,16 @@ function resetForm() {
 // Delete button click hone par
 function deleteStudent(id) {
     if (confirm("Are you sure you want to delete this student?")) {
-        fetch(`${API_URL}/${id}`, { method: "DELETE" })
-            .then(() => fetchStudents())
-            .catch(err => console.error("Error deleting student: - script.js:144", err));
+        fetch(`${API_URL}/${id}`, {
+            method: "DELETE",
+            headers: getAuthHeaders()
+        })
+            .then(res => {
+                if (res.status === 401) { logout(); return; }
+                fetchStudents();
+            })
+            .catch(err => console.error("Error deleting student: - script.js:166", err));
     }
 }
-searchInput.addEventListener(
-"input",
-fetchStudents
-);
+
+searchInput.addEventListener("input", fetchStudents);

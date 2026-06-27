@@ -35,7 +35,7 @@ public class StudentController {
 
     // PUT: student update karna
     @PutMapping("/{id}")
-    public Student updateStudent(@PathVariable Long id, @RequestBody Student student) {
+    public Student updateStudent(@PathVariable Long id, @Valid @RequestBody Student student) {
         return studentService.updateStudent(id, student);
     }
 
