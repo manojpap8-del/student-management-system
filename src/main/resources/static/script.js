@@ -54,10 +54,10 @@ function fetchStudents() {
 
             document.getElementById("studentCount").textContent = data.length;
 
-            filtered.forEach(student => {
+           filtered.forEach((student, index) => {
                 const row = document.createElement("tr");
                 row.innerHTML = `
-                    <td data-label="ID">${student.id}</td>
+                   <td data-label="S.No">${index + 1}</td>
                     <td data-label="Name">${student.name}</td>
                     <td data-label="Email">${student.email}</td>
                     <td data-label="Course">${student.course}</td>
