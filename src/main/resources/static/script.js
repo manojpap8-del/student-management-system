@@ -168,3 +168,71 @@ function deleteStudent(id) {
 }
 
 searchInput.addEventListener("input", fetchStudents);
+
+// ===================== CHATBOT (Ask Your Doubts) =====================
+const CHAT_API = "/chat";
+
+const chatForm = document.getElementById("chatForm");
+const chatInput = document.getElementById("chatInput");
+const chatThread = document.getElementById("chatThread");
+const chatSendBtn = document.getElementById("chatSendBtn");
+
+if (chatForm) {
+    chatForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        const message = chatInput.value.trim();
+        if (!message) return;
+
+        addChatMessage(message, "user");
+        chatInput.value = "";
+        chatSendBtn.disabled = true;
+        const thinkingRow = addThinkingBubble();
+
+        fetch(CHAT_API, {
+            method: "POST",
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ message: message })
+        })
+            .then(res => {
+                thinkingRow.remove();
+                if (res.status === 401) { logout(); return; }
+                if (!res.ok) throw new Error("Server responded with " + res.status);
+                return res.json();
+            })
+            .then(data => {
+                if (!data) return;
+                addChatMessage(data.reply || "(no reply received)", "bot");
+            })
+            .catch(err => {
+                addChatMessage("Sorry, I could not reach the assistant. (" + err.message + ")", "bot");
+            })
+            .finally(() => {
+                chatSendBtn.disabled = false;
+                chatInput.focus();
+            });
+    });
+}
+
+function addChatMessage(text, who) {
+    const row = document.createElement("div");
+    row.className = "chat-row " + who;
+    const bubble = document.createElement("div");
+    bubble.className = "chat-bubble";
+    bubble.textContent = text;
+    row.appendChild(bubble);
+    chatThread.appendChild(row);
+    chatThread.scrollTop = chatThread.scrollHeight;
+    return row;
+}
+
+function addThinkingBubble() {
+    const row = document.createElement("div");
+    row.className = "chat-row bot";
+    const bubble = document.createElement("div");
+    bubble.className = "chat-bubble thinking";
+    bubble.innerHTML = "<span></span><span></span><span></span>";
+    row.appendChild(bubble);
+    chatThread.appendChild(row);
+    chatThread.scrollTop = chatThread.scrollHeight;
+    return row;
+}
